@@ -1,31 +1,45 @@
-//I/O Variables 
-int button = 8;
-int led = 9;
+//I/O Variables
+int button = 9;
+int led = 7 ;
 
 //Debouncing Variables
 unsigned long start = millis();
 unsigned long readBegin;
-unsigned long readLength;
+unsigned long readEnd;
+unsigned long readLength = 0;
 bool previousState = LOW; // previous state of the button
 bool currentState; // as of now, button is LOW, but this will change later
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); //9600 baud Serial monitor (for troubleshooting)
+
   pinMode(button, INPUT);
   pinMode(led, OUTPUT);
+
+  digitalWrite(led, LOW);//makes sure the LED starts at the LOW settings
 
 }
 
 void loop() {
-  readBegin = millis();
-  currentState = digitalRead(button);
-  if (previousState == LOW && currentState == HIGH) //prevents boucing because it will read the previousState as HIGH and not turn LED on
+
+  currentState = digitalRead(button); //reads the current state of the button
+  readBegin = millis(); //starts the readBegin millis here to find the time that the program begins the I/O code
+  if (previousState == LOW && currentState == LOW) {
+    digitalWrite(led, LOW);
+    delay(500);
+    currentState = digitalRead(button);
+  }
+  else if (previousState == LOW && currentState == HIGH) //prevents boucing because it will read the previousState as HIGH and not turn LED on
   {
     digitalWrite(led, HIGH);
     delay(500);
     digitalWrite(led, LOW);
-  }
-  previousState = currentState; //updates the previousState after running the Output if statement
-  readLength = start - readBegin;
+    delay(500);
+    currentState = digitalRead(button);
 
+  }
+  else {
+    delay(500);
+    currentState = digitalRead(button);
+  }
 }
